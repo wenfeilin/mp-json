@@ -1,5 +1,6 @@
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * JSON hashes/objects.
@@ -10,9 +11,35 @@ public class JSONHash {
   // | Fields |
   // +--------+
 
+  /**
+   * The number of values currently stored in the hash table. We use this to
+   * determine when to expand the hash table.
+   */
+  int size = 0;
+
+  /**
+   * The array that we use to store the ArrayList of key/value pairs. (We use an
+   * array, rather than an ArrayList, because we want to control expansion and
+   * ArrayLists of ArrayLists are just weird.)
+   */
+  Object[] buckets;
+
+  /**
+   * Our helpful random number generator, used primarily when expanding the size
+   * of the table.
+   */
+  Random rand;
+
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
+
+  /**
+   * Create a new hash table.
+   */
+  public JSONHash() {
+    this.rand = new Random();
+  } // JSONHash
 
   // +-------------------------+-------------------------------------
   // | Standard object methods |
@@ -69,6 +96,39 @@ public class JSONHash {
   } // get(JSONString)
 
   /**
+   * Get the value associated with a key.
+   */
+  @Override
+  public JSONValue get(JSONString key) {
+    int index = find(key);
+    @SuppressWarnings("unchecked")
+    ArrayList<Pair<K,V>> alist = (ArrayList<Pair<K,V>>) buckets[index];
+    if (alist == null) {
+      if (REPORT_BASIC_CALLS && (reporter != null)) {
+        reporter.report("get(" + key + ") failed");
+      } // if reporter != null
+      throw new IndexOutOfBoundsException("Invalid key: " + key);
+    } else {
+
+      for (int i = 0; i < alist.size(); i++) {
+        if (alist.get(i).key().equals(key)) {
+          Pair<K,V> pair = alist.get(i);
+          return pair.value();
+        }
+      }
+      return null;
+    } // get
+  }  // get(JSONString)
+
+    /**
+     * Find the index of the entry with a given key. If there is no such entry,
+     * return the index of an entry we can use to store that key.
+     */
+    int find(JSONString key) {
+      return Math.abs(key.hashCode()) % this.buckets.length;
+    } // find(K)
+    
+  /**
    * Get all of the key/value pairs.
    */
   public Iterator<KVPair<JSONString,JSONValue>> iterator() {
@@ -86,7 +146,7 @@ public class JSONHash {
    * Find out how many key/value pairs are in the hash table.
    */
   public int size() {
-    return 0;           // STUB
+    return this.size();          
   } // size()
 
 } // class JSONHash
