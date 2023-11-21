@@ -55,14 +55,18 @@ public class JSONReal {
    * Compare to another object.
    */
   public boolean equals(Object other) {
-    return true;        // STUB
+    if (other instanceof JSONReal) {
+      return this.value.equals(((JSONReal)other).getValue());
+    } else {
+      return false;
+    }
   } // equals(Object)
 
   /**
    * Compute the hash code.
    */
   public int hashCode() {
-    return 0;           // STUB
+    return this.value.hashCode(); 
   } // hashCode()
 
   // +--------------------+------------------------------------------
@@ -73,7 +77,8 @@ public class JSONReal {
    * Write the value as JSON.
    */
   public void writeJSON(PrintWriter pen) {
-                        // STUB
+    pen.print(this.value.toString()); // for now
+    pen.flush();
   } // writeJSON(PrintWriter)
 
   /**
