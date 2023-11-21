@@ -55,14 +55,18 @@ public class JSONInteger {
    * Compare to another object.
    */
   public boolean equals(Object other) {
-    return true;        // STUB
+    if (other instanceof JSONInteger) {
+      return this.value.equals(((JSONInteger) other).getValue());
+    } else {
+      return false;
+    }
   } // equals(Object)
 
   /**
    * Compute the hash code.
    */
   public int hashCode() {
-    return 0;           // STUB
+    return this.value.hashCode();  
   } // hashCode()
 
   // +--------------------+------------------------------------------
@@ -73,7 +77,8 @@ public class JSONInteger {
    * Write the value as JSON.
    */
   public void writeJSON(PrintWriter pen) {
-                        // STUB
+    pen.print(this.value.toString()); // do positive JSONIntegers permit leading 0's?
+    pen.flush();
   } // writeJSON(PrintWriter)
 
   /**
@@ -82,5 +87,4 @@ public class JSONInteger {
   public BigInteger getValue() {
     return this.value;
   } // getValue()
-
 } // class JSONInteger
