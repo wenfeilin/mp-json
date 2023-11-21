@@ -33,21 +33,25 @@ public class JSONString {
    * Convert to a string (e.g., for printing).
    */
   public String toString() {
-    return "";          // STUB
+    return this.value;
   } // toString()
 
   /**
    * Compare to another object.
    */
   public boolean equals(Object other) {
-    return true;        // STUB
+    if (other instanceof JSONString) {
+      return this.value.equals(((JSONString)other).getValue());
+    } else {
+      return false;
+    }
   } // equals(Object)
 
   /**
    * Compute the hash code.
    */
   public int hashCode() {
-    return 0;           // STUB
+    return this.value.hashCode();
   } // hashCode()
 
   // +--------------------+------------------------------------------
@@ -58,7 +62,45 @@ public class JSONString {
    * Write the value as JSON.
    */
   public void writeJSON(PrintWriter pen) {
-                        // STUB
+    String JSONstr = "\"";
+
+    for (int i = 0; i < this.value.length(); i++) {
+      char currentChar = this.value.charAt(i);
+
+      if (Character.isLetter(currentChar) || Character.isDigit(currentChar) || Character.isWhitespace(currentChar)) {
+        JSONstr += currentChar;
+      } else {
+        switch (currentChar) {
+          case '\n': 
+            JSONstr += "\\n";
+            break;
+          case '\t':
+            JSONstr += "\\t";
+            break;
+          case '\r':
+            JSONstr += "\\r";
+            break;
+          case '\"':
+            JSONstr += "\"";
+            break;
+          case '\'':
+            JSONstr += "\'";
+            break;
+          case '\b':
+            JSONstr += "\b'";
+            break;
+          case '\\':
+            JSONstr += "\\'";
+            break;
+          case '\f':
+            JSONstr += "\\'";
+            break;
+        }
+      }
+    }
+
+    pen.print(JSONstr);
+    pen.flush();
   } // writeJSON(PrintWriter)
 
   /**
