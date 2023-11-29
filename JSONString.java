@@ -99,7 +99,7 @@ public class JSONString implements JSONValue {
       }
     }
 
-    pen.print(JSONstr);
+    pen.print("\"" + JSONstr + "\"");
     pen.flush();
   } // writeJSON(PrintWriter)
 
@@ -109,5 +109,4 @@ public class JSONString implements JSONValue {
   public String getValue() {
     return this.value;
   } // getValue()
-
 } // class JSONString
