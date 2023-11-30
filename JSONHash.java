@@ -16,6 +16,7 @@ public class JSONHash implements JSONValue {
    * The load factor for expanding the table.
    */
   static final double LOAD_FACTOR = 0.5;
+  static final int INITIAL_CAPACITY = 41;
 
 
   // +--------+------------------------------------------------------
@@ -50,7 +51,7 @@ public class JSONHash implements JSONValue {
    */
   public JSONHash() {
     this.rand = new Random();
-    this.buckets = new Object[41]; 
+    this.buckets = new Object[INITIAL_CAPACITY]; 
     this.size = 0;
   } // JSONHash
 
@@ -136,8 +137,51 @@ public class JSONHash implements JSONValue {
   /**
    * Get all of the key/value pairs.
    */
+  @SuppressWarnings("unchecked")
   public Iterator<KVPair<JSONString,JSONValue>> iterator() {
-    return null;        // STUB
+    return new Iterator<KVPair<JSONString,JSONValue>>() {
+      int outerIndex = 0; // The position in the array of buckets
+      int innerIndex = 0; // The position in the arraylist of a certain bucket
+      public boolean hasNext() {
+        if (outerIndex >= buckets.length) {
+          // if the position is out of bound of the array of buckets
+          return false;
+        } // if
+
+        // if the current bucket is null
+        if (buckets[outerIndex] == null) {
+          for (int i = outerIndex + 1; i < buckets.length; i++) {
+            if (buckets[i] != null) {
+            return true;     // if we found next nonempty bucket
+            } // if 
+          } // for
+          return false;   // if all subsequent buckets are null too
+        } // if
+        
+        // if the current bucket is not null
+        ArrayList<KVPair<JSONString, JSONValue>> alist = (ArrayList<KVPair<JSONString, JSONValue>>) buckets[outerIndex];
+        if (innerIndex < alist.size() - 1) {
+          return true; // if the current KVPair is not the last one in the bucket
+        } else {
+          for (int i = outerIndex + 1; i < buckets.length; i++) {
+            if (buckets[i] != null) {
+            // if the current KVPair is the last one in the current bucket and we 
+            // found the next nonempty bucket
+            return true;
+            } // if 
+          } // for
+          // if the current KVPair is the last one in the current bucket and all 
+          // subsequent buckets are null
+          return false;  
+        } // if...else
+        
+      } // hasNext()
+
+      public KVPair<JSONString, JSONValue> next() {
+               
+        return null;
+      } // next()
+    }; // new Iterator for buckets
   } // iterator()
 
 
