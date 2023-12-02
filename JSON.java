@@ -68,64 +68,75 @@ public class JSON {
 
     int num0InASCII = 48;
     int num9InASCII = 57;
-    
-    // int decimalPointASCII = 46;
-    // int eInASCII = 101;
-    // int EInASCII = 69;
-    // int negativeSignASCII = 45;
-    // boolean isReal = false;
 
-    int input = source.read();
-    pos++;
+    int input = ch;
+
     int nextInput;
 
-    if (num0InASCII <= input || num9InASCII >= input) {
-      String numStr = "";
-      nextInput = source.read();
-      while (num0InASCII <= nextInput || num9InASCII >= nextInput) {
+    if (num0InASCII <= input && num9InASCII >= input) {
+      String numStr = "" + (char) input;
+      
+      nextInput = skipWhitespace(source);
+      while (num0InASCII <= nextInput && num9InASCII >= nextInput) {
         numStr += (char) nextInput;
-        nextInput = source.read();
-        pos++;
+        nextInput = skipWhitespace(source);
       } // while
 
-      nextInput = source.read();
-      pos++;
+      // nextInput = skipWhitespace(source);
       if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
-        nextInput = source.read();
-        pos++;
         numStr += (char) nextInput;
+        nextInput = skipWhitespace(source);
+        // numStr += (char) nextInput;
         if (nextInput == (int) '+' || nextInput == (int) '-') {
-          nextInput = source.read();
-          pos++;
-          if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
+          numStr += (char) nextInput;
+          nextInput = skipWhitespace(source);
+          if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
             do {
               numStr += (char) nextInput;
-              nextInput = source.read();
-              pos++;
-            } while (num0InASCII <= nextInput || num9InASCII >= nextInput); 
+              nextInput = skipWhitespace(source);
+            } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
           } else {
             throw new ParseException("Invalid format for JSONReal", pos);
           } // if...else
-        } else if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
+        } /* else if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
           do {
             numStr += (char) nextInput;
-            nextInput = source.read();
-            pos++;
-          } while (num0InASCII <= nextInput || num9InASCII >= nextInput);
-        } else {
+            nextInput = skipWhitespace(source);
+          } while (num0InASCII <= nextInput && num9InASCII >= nextInput);
+        } */ else {
           throw new ParseException("Invalid format for JSONReal", pos);
         } // if
         return new JSONReal(numStr);
       } else if (nextInput == (int) '.') {
-          nextInput = source.read();
-          pos++;
-          numStr += (char) nextInput;
-          if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
+        numStr += ".";
+        nextInput = skipWhitespace(source);
+          // numStr += (char) nextInput;
+          if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
             do {
               numStr += (char) nextInput;
-              nextInput = source.read();
-              pos++;
-            } while (num0InASCII <= nextInput || num9InASCII >= nextInput); 
+              nextInput = skipWhitespace(source);
+            } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+            
+
+            if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
+              numStr += (char) nextInput;
+              nextInput = skipWhitespace(source);
+              // numStr += (char) nextInput;
+              if (nextInput == (int) '+' || nextInput == (int) '-') {
+                numStr += (char) nextInput;
+                nextInput = skipWhitespace(source);
+                if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+                  do {
+                    numStr += (char) nextInput;
+                    nextInput = skipWhitespace(source);
+                  } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+                } else {
+                  throw new ParseException("Invalid format for JSONReal", pos);
+                } // if...else
+              } else {
+                throw new ParseException("Invalid format for JSONReal", pos);
+              } // if
+            } // if
           } else {
             throw new ParseException("Invalid format for JSONReal", pos);
           } // if...else
@@ -136,32 +147,124 @@ public class JSON {
     } // if
 
     if (input == '-') {
-      String numStr = "";
-      nextInput = source.read();
+      String numStr = "-";
+      input = skipWhitespace(source);
 
-      if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
-        numStr = "";
-        nextInput = source.read();
-        while (num0InASCII <= nextInput || num9InASCII >= nextInput) {
+      if (num0InASCII <= input && num9InASCII >= input) {
+        numStr += (char) input;
+        
+        nextInput = skipWhitespace(source);
+        while (num0InASCII <= nextInput && num9InASCII >= nextInput) {
           numStr += (char) nextInput;
-          nextInput = source.read();
-          pos++;
+          nextInput = skipWhitespace(source);
         } // while
   
-        nextInput = source.read();
-        pos++;
+        // nextInput = skipWhitespace(source);
         if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
-          nextInput = source.read();
-          pos++;
+          numStr += (char) nextInput;
+          nextInput = skipWhitespace(source);
+          // numStr += (char) nextInput;
+          if (nextInput == (int) '+' || nextInput == (int) '-') {
+            numStr += (char) nextInput;
+            nextInput = skipWhitespace(source);
+            if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+              do {
+                numStr += (char) nextInput;
+                nextInput = skipWhitespace(source);
+              } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+            } else {
+              throw new ParseException("Invalid format for JSONReal", pos);
+            } // if...else
+          } /* else if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+            do {
+              numStr += (char) nextInput;
+              nextInput = skipWhitespace(source);
+            } while (num0InASCII <= nextInput && num9InASCII >= nextInput);
+          } */ else {
+            throw new ParseException("Invalid format for JSONReal", pos);
+          } // if
+
+          if (numStr.substring(1,3).equals("00")) {
+            throw new ParseException("Invalid format for JSONReal at postion " + (pos - (numStr.length() - 3)), pos - (numStr.length() -2));
+          } //if
+          return new JSONReal(numStr);
+        } else if (nextInput == (int) '.') {
+          numStr += ".";
+          nextInput = skipWhitespace(source);
+            // numStr += (char) nextInput;
+            if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+              do {
+                numStr += (char) nextInput;
+                nextInput = skipWhitespace(source);
+              } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+              
+  
+              if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
+                numStr += (char) nextInput;
+                nextInput = skipWhitespace(source);
+                // numStr += (char) nextInput;
+                if (nextInput == (int) '+' || nextInput == (int) '-') {
+                  numStr += (char) nextInput;
+                  nextInput = skipWhitespace(source);
+                  if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+                    do {
+                      numStr += (char) nextInput;
+                      nextInput = skipWhitespace(source);
+                    } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+                  } else {
+                    throw new ParseException("Invalid format for JSONReal %s", pos);
+                  } // if...else
+                } else {
+                  throw new ParseException("Invalid format for JSONReal", pos);
+                } // if
+              } // if
+            } else {
+              throw new ParseException("Invalid format for JSONReal", pos);
+            } // if...else
+
+            if (numStr.substring(1,3).equals("00")) {
+              throw new ParseException("Invalid format for JSONReal at postion " + (pos - (numStr.length() - 3)), pos - (numStr.length() -2));
+            } //if
+            return new JSONReal(numStr);
+        } else {
+          if (numStr.substring(1,3).equals("00")) {
+              throw new ParseException("Invalid format for JSONInteger at postion " + (pos - (numStr.length() - 3)), pos - (numStr.length() -2));
+            } //if
+          return new JSONInteger(numStr);
+        } // if...else   
+      } // if
+
+
+
+    }
+
+
+
+
+
+/* 
+
+
+      nextInput = skipWhitespace(source);
+
+      if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+        numStr = "";
+        nextInput = skipWhitespace(source);
+        while (num0InASCII <= nextInput && num9InASCII >= nextInput) {
+          numStr += (char) nextInput;
+          nextInput = skipWhitespace(source);
+        } // while
+  
+        nextInput = skipWhitespace(source);
+        if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
+          nextInput = skipWhitespace(source);
           numStr += (char) nextInput;
           if (nextInput == (int) '+' || nextInput == (int) '-') {
-            nextInput = source.read();
-            pos++;
+            nextInput = skipWhitespace(source);
             if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
               do {
                 numStr += (char) nextInput;
-                nextInput = source.read();
-                pos++;
+                nextInput = skipWhitespace(source);
               } while (num0InASCII <= nextInput || num9InASCII >= nextInput); 
             } else {
               throw new ParseException("Invalid format for JSONReal", pos);
@@ -169,22 +272,19 @@ public class JSON {
           } else if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
             do {
               numStr += (char) nextInput;
-              nextInput = source.read();
-              pos++;
+              nextInput = skipWhitespace(source);
             } while (num0InASCII <= nextInput || num9InASCII >= nextInput);
           } else {
             throw new ParseException("Invalid format for JSONReal", pos);
           } // if
           return new JSONReal(numStr);
         } else if (nextInput == (int) '.') {
-            nextInput = source.read();
-            pos++;
+          nextInput = skipWhitespace(source);
             numStr += (char) nextInput;
             if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
               do {
                 numStr += (char) nextInput;
-                nextInput = source.read();
-                pos++;
+                nextInput = skipWhitespace(source);
               } while (num0InASCII <= nextInput || num9InASCII >= nextInput); 
             } else {
               throw new ParseException("Invalid format for JSONReal", pos);
@@ -195,36 +295,35 @@ public class JSON {
         } // if...else      
       } // if
     } // if
-
+*/
     switch (input) {
       // String
-      case 147:
+      case (int) '"':
         String strForJSONString = "";
-        nextInput = source.read();
-        pos++;
+
+        // nextInput = source.read();
+        // pos++;
+        nextInput = skipWhitespace(source);
         
-        while (nextInput != 148) {
-          strForJSONString += nextInput;
-          nextInput = source.read();
-          pos++;
+        while (nextInput != (int) '"') {
+          strForJSONString += (char) nextInput;
+          nextInput = skipWhitespace(source);
         }
         return new JSONString(strForJSONString);
 
       // Object (Hash)
-      case (int) '{':
+      case (int) '{': // doesn't work for empty hashes
         JSONHash hashtable = new JSONHash();
+        
 
-        nextInput = source.read();
-        pos++;
-        while (nextInput != (int) '}') {
+        while (input != (int) '}') {
           JSONValue key = parseKernel(source);
           if (!(key instanceof JSONString)) {
             throw new ParseException("Invalid key for JSONHash", pos);
           } // if
 
-          nextInput = source.read();
-          pos++;
-          if (nextInput != ':') {
+          input = skipWhitespace(source);
+          if (input != ':') {
             throw new ParseException("Invalid format for JSONHash", pos);
           } // if
           
@@ -232,26 +331,31 @@ public class JSON {
 
           hashtable.set((JSONString) key, value);
 
-          nextInput = source.read();
-          pos++;
-          if (nextInput != (int) ',') {
+          input = skipWhitespace(source);
+          if (input != (int) ',') {
+            if (input == (int) '}') {
+              return hashtable;
+            }
             throw new ParseException("Invalid format for JSONHash", pos);
           } // if
-
-          return hashtable;
         } // while
+        return hashtable;
 
       // Array 
-      case (int) '[':
+      case (int) '[': // doesn't work for empty arrs
         
         JSONArray arr = new JSONArray();
-        nextInput = source.read();
-        pos++;
-        while (nextInput != (int) ']') {
+        // nextInput = source.read();
+        // pos++;
+        while (input != (int) ']') {
           arr.add(parseKernel(source));
-          nextInput = source.read();
-          pos++;
-          if (nextInput != (int) ',') {
+          input = skipWhitespace(source);
+          // nextInput = source.read();
+          // pos++;
+          if (input != (int) ',') {
+            if (input == (int) ']') {
+              return arr;
+            }
             throw new ParseException("Invalid format for JSONArray", pos);
           } // if
         } // while
