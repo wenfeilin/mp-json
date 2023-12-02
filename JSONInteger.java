@@ -66,7 +66,7 @@ public class JSONInteger implements JSONValue {
    * Compute the hash code.
    */
   public int hashCode() {
-    return this.value.hashCode();  
+    return this.value.hashCode();
   } // hashCode()
 
   // +--------------------+------------------------------------------
@@ -77,7 +77,7 @@ public class JSONInteger implements JSONValue {
    * Write the value as JSON.
    */
   public void writeJSON(PrintWriter pen) {
-    pen.print(this.value.toString()); // do positive JSONIntegers permit leading 0's?
+    pen.print(this.value.toString());
     pen.flush();
   } // writeJSON(PrintWriter)
 

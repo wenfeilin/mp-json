@@ -41,7 +41,7 @@ public class JSONString implements JSONValue {
    */
   public boolean equals(Object other) {
     if (other instanceof JSONString) {
-      return this.value.equals(((JSONString)other).getValue());
+      return this.value.equals(((JSONString) other).getValue());
     } else {
       return false;
     }
@@ -67,11 +67,12 @@ public class JSONString implements JSONValue {
     for (int i = 0; i < this.value.length(); i++) {
       char currentChar = this.value.charAt(i);
 
-      if (Character.isLetter(currentChar) || Character.isDigit(currentChar) || Character.isWhitespace(currentChar)) {
+      if (Character.isLetter(currentChar) || Character.isDigit(currentChar)
+          || Character.isSpaceChar(currentChar)) {
         JSONstr += currentChar;
       } else {
         switch (currentChar) {
-          case '\n': 
+          case '\n':
             JSONstr += "\\n";
             break;
           case '\t':
@@ -90,16 +91,16 @@ public class JSONString implements JSONValue {
             JSONstr += "\b'";
             break;
           case '\\':
-            JSONstr += "\\'";
+            JSONstr += "\\";
             break;
           case '\f':
-            JSONstr += "\\'";
+            JSONstr += "\\f";
             break;
-        }
-      }
-    }
+        } // switch
+      } // if/else
+    } // for
 
-    pen.print("\"" + JSONstr + "\"");
+    pen.print(JSONstr + "\"");
     pen.flush();
   } // writeJSON(PrintWriter)
 
