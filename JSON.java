@@ -55,6 +55,93 @@ public class JSON {
   // | Local helpers |
   // +---------------+
 
+  private static Boolean isNumber(int input) {
+    int num0InASCII = 48;
+    int num9InASCII = 57;
+    return num0InASCII <= input && num9InASCII >= input;
+  } // isNUmber(int)
+
+
+  private static void nextNumbers(String numStr, int nextInput, Reader source) throws IOException {
+    do {
+      addAndIncrement(numStr, nextInput, source);
+    } while (isNumber(nextInput)); 
+  } // nextNumbers(String, int, Reader)
+
+  private static int addAndIncrement(String numStr, int nextInput, Reader source) throws IOException {
+    numStr += (char) nextInput;
+    nextInput = skipWhitespace(source);
+    return nextInput;
+  } // addAndIncrement(String, int, Reader)
+
+
+  private static JSONValue readNum(boolean isPositive, int input, Reader source) throws IOException, ParseException{
+      
+    String numStr = "";
+    if (isPositive) {
+        numStr += (char) input;
+      } else {
+        numStr = "-" + (char) input;
+      }
+      
+      int nextInput = skipWhitespace(source);
+      while (isNumber(nextInput)) {
+        nextInput = addAndIncrement(numStr, nextInput, source);
+      } // while
+
+      if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
+        nextInput = addAndIncrement(numStr, nextInput, source);
+        if (nextInput == (int) '+' || nextInput == (int) '-') {
+          nextInput = addAndIncrement(numStr, nextInput, source);
+          if (isNumber(nextInput)) {
+            nextNumbers(numStr, nextInput, source);
+          } else {
+            throw new ParseException("Invalid format for JSONReal", pos);
+          } // if...else
+        } else {
+          throw new ParseException("Invalid format for JSONReal", pos);
+        } // if
+        checkLeadingZero(isPositive, numStr);
+        return new JSONReal(numStr);
+      } else if (nextInput == (int) '.') {
+        nextInput = addAndIncrement(numStr, nextInput, source);
+          if (isNumber(nextInput)) {
+            nextNumbers(numStr, nextInput, source);
+
+            if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
+              nextInput = addAndIncrement(numStr, nextInput, source);
+              if (nextInput == (int) '+' || nextInput == (int) '-') {
+                nextInput = addAndIncrement(numStr, nextInput, source);
+                if (isNumber(nextInput)) {
+                  nextNumbers(numStr, nextInput, source);
+                } else {
+                  throw new ParseException("Invalid format for JSONReal", pos);
+                } // if...else
+              } else {
+                throw new ParseException("Invalid format for JSONReal", pos);
+              } // if
+            } // if
+          } else {
+            throw new ParseException("Invalid format for JSONReal", pos);
+          } // if...else
+          checkLeadingZero(isPositive, numStr);
+          return new JSONReal(numStr);
+      } else {
+        checkLeadingZero(isPositive, numStr);
+        return new JSONInteger(numStr);
+      } // if...else      
+  } // readNum(Boolean, int, Reader)
+
+
+  private static void checkLeadingZero(Boolean isPostive, String numStr) throws ParseException {
+    if (!isPostive) {
+      if ((numStr.length() > 2) && (numStr.substring(1,3).equals("00"))) {
+        throw new ParseException("Invalid format for JSONReal at postion " + (pos - (numStr.length() - 3)), pos - (numStr.length() -2));
+      } //if
+    } // if
+  } // checkLeadingZero(Boolean, String)
+
+    
   /**
    * Parse JSON from a reader, keeping track of the current position
    */
@@ -65,71 +152,59 @@ public class JSON {
       throw new ParseException("Unexpected end of file", pos);
     }
 
-
-    int num0InASCII = 48;
-    int num9InASCII = 57;
-
+    // int num0InASCII = 48;
+    // int num9InASCII = 57;
+ 
     int input = ch;
-
     int nextInput;
 
-    if (num0InASCII <= input && num9InASCII >= input) {
+
+    // Read postive integer/real
+    if (isNumber(input)) {
+      return readNum(true, input, source);
+    } // if
+
+    // Read negative integer/real
+    if (input == '-') {
+      input = skipWhitespace(source);
+      if (isNumber(input)) {
+        return readNum(false, input, source);
+      } // if
+    } // if
+
+    /* 
+    if (isNumber(input)) {
       String numStr = "" + (char) input;
       
       nextInput = skipWhitespace(source);
-      while (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-        numStr += (char) nextInput;
-        nextInput = skipWhitespace(source);
+      while (isNumber(nextInput)) {
+        addAndIncrement(numStr, nextInput, source);
       } // while
 
-      // nextInput = skipWhitespace(source);
       if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
-        numStr += (char) nextInput;
-        nextInput = skipWhitespace(source);
-        // numStr += (char) nextInput;
+        addAndIncrement(numStr, nextInput, source);
         if (nextInput == (int) '+' || nextInput == (int) '-') {
-          numStr += (char) nextInput;
-          nextInput = skipWhitespace(source);
-          if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-            do {
-              numStr += (char) nextInput;
-              nextInput = skipWhitespace(source);
-            } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+          addAndIncrement(numStr, nextInput, source);
+          if (isNumber(nextInput)) {
+            nextNumbers(numStr, nextInput, source);
           } else {
             throw new ParseException("Invalid format for JSONReal", pos);
           } // if...else
-        } /* else if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-          do {
-            numStr += (char) nextInput;
-            nextInput = skipWhitespace(source);
-          } while (num0InASCII <= nextInput && num9InASCII >= nextInput);
-        } */ else {
+        } else {
           throw new ParseException("Invalid format for JSONReal", pos);
         } // if
         return new JSONReal(numStr);
       } else if (nextInput == (int) '.') {
-        numStr += ".";
-        nextInput = skipWhitespace(source);
-          // numStr += (char) nextInput;
-          if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-            do {
-              numStr += (char) nextInput;
-              nextInput = skipWhitespace(source);
-            } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
-            
-
+        addAndIncrement(numStr, nextInput, source);
+          if (isNumber(nextInput)) {
+            nextNumbers(numStr, nextInput, source);
+          
             if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
-              numStr += (char) nextInput;
-              nextInput = skipWhitespace(source);
-              // numStr += (char) nextInput;
+              addAndIncrement(numStr, nextInput, source);
               if (nextInput == (int) '+' || nextInput == (int) '-') {
-                numStr += (char) nextInput;
-                nextInput = skipWhitespace(source);
-                if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-                  do {
-                    numStr += (char) nextInput;
-                    nextInput = skipWhitespace(source);
-                  } while (num0InASCII <= nextInput && num9InASCII >= nextInput); 
+                addAndIncrement(numStr, nextInput, source);
+                if (isNumber(nextInput)) {
+                  nextNumbers(numStr, nextInput, source);
                 } else {
                   throw new ParseException("Invalid format for JSONReal", pos);
                 } // if...else
@@ -143,10 +218,10 @@ public class JSON {
           return new JSONReal(numStr);
       } else {
         return new JSONInteger(numStr);
-      } // if...else      
-    } // if
-
-    if (input == '-') {
+      } // if...else  
+    } //if
+*/
+/*  
       String numStr = "-";
       input = skipWhitespace(source);
 
@@ -159,11 +234,9 @@ public class JSON {
           nextInput = skipWhitespace(source);
         } // while
   
-        // nextInput = skipWhitespace(source);
         if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
           numStr += (char) nextInput;
           nextInput = skipWhitespace(source);
-          // numStr += (char) nextInput;
           if (nextInput == (int) '+' || nextInput == (int) '-') {
             numStr += (char) nextInput;
             nextInput = skipWhitespace(source);
@@ -175,12 +248,7 @@ public class JSON {
             } else {
               throw new ParseException("Invalid format for JSONReal", pos);
             } // if...else
-          } /* else if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-            do {
-              numStr += (char) nextInput;
-              nextInput = skipWhitespace(source);
-            } while (num0InASCII <= nextInput && num9InASCII >= nextInput);
-          } */ else {
+          } else {
             throw new ParseException("Invalid format for JSONReal", pos);
           } // if
 
@@ -191,7 +259,6 @@ public class JSON {
         } else if (nextInput == (int) '.') {
           numStr += ".";
           nextInput = skipWhitespace(source);
-            // numStr += (char) nextInput;
             if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
               do {
                 numStr += (char) nextInput;
@@ -202,7 +269,6 @@ public class JSON {
               if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
                 numStr += (char) nextInput;
                 nextInput = skipWhitespace(source);
-                // numStr += (char) nextInput;
                 if (nextInput == (int) '+' || nextInput == (int) '-') {
                   numStr += (char) nextInput;
                   nextInput = skipWhitespace(source);
@@ -233,69 +299,9 @@ public class JSON {
           return new JSONInteger(numStr);
         } // if...else   
       } // if
-
-
-
-    }
-
-
-
-
-
-/* 
-
-
-      nextInput = skipWhitespace(source);
-
-      if (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-        numStr = "";
-        nextInput = skipWhitespace(source);
-        while (num0InASCII <= nextInput && num9InASCII >= nextInput) {
-          numStr += (char) nextInput;
-          nextInput = skipWhitespace(source);
-        } // while
-  
-        nextInput = skipWhitespace(source);
-        if (nextInput == (int) 'e' || nextInput == (int) 'E' ) {
-          nextInput = skipWhitespace(source);
-          numStr += (char) nextInput;
-          if (nextInput == (int) '+' || nextInput == (int) '-') {
-            nextInput = skipWhitespace(source);
-            if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
-              do {
-                numStr += (char) nextInput;
-                nextInput = skipWhitespace(source);
-              } while (num0InASCII <= nextInput || num9InASCII >= nextInput); 
-            } else {
-              throw new ParseException("Invalid format for JSONReal", pos);
-            } // if...else
-          } else if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
-            do {
-              numStr += (char) nextInput;
-              nextInput = skipWhitespace(source);
-            } while (num0InASCII <= nextInput || num9InASCII >= nextInput);
-          } else {
-            throw new ParseException("Invalid format for JSONReal", pos);
-          } // if
-          return new JSONReal(numStr);
-        } else if (nextInput == (int) '.') {
-          nextInput = skipWhitespace(source);
-            numStr += (char) nextInput;
-            if (num0InASCII <= nextInput || num9InASCII >= nextInput) {
-              do {
-                numStr += (char) nextInput;
-                nextInput = skipWhitespace(source);
-              } while (num0InASCII <= nextInput || num9InASCII >= nextInput); 
-            } else {
-              throw new ParseException("Invalid format for JSONReal", pos);
-            } // if...else
-            return new JSONReal(numStr);
-        } else {
-          return new JSONInteger(numStr);
-        } // if...else      
-      } // if
-    } // if
 */
+
+
     switch (input) {
       // String
       case (int) '"':
