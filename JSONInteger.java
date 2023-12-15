@@ -3,6 +3,10 @@ import java.math.BigInteger;
 
 /**
  * JSON integers.
+ * 
+ * @author SamR (starter code)
+ * @author Lydia Ye
+ * @author Wenfei Lin
  */
 public class JSONInteger implements JSONValue {
 
@@ -59,7 +63,7 @@ public class JSONInteger implements JSONValue {
       return this.value.equals(((JSONInteger) other).getValue());
     } else {
       return false;
-    }
+    } // if/else
   } // equals(Object)
 
   /**

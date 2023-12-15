@@ -3,7 +3,7 @@ Mini-Project 8: JSON
 
 A simple JSON parser.
 
-Implemented by Lydia Ye and Wenfei LIn for CSC-207-01 2023Fa.
+Implemented by Lydia Ye and Wenfei Lin for CSC-207-01 2023Fa.
 
 Acknowledgements:
 

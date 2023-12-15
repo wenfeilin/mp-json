@@ -2,6 +2,10 @@ import java.io.PrintWriter;
 
 /**
  * JSON constants.
+ * 
+ * @author SamR (starter code)
+ * @author Lydia Ye
+ * @author Wenfei Lin
  */
 public class JSONConstant implements JSONValue {
 
@@ -63,19 +67,20 @@ public class JSONConstant implements JSONValue {
    * Compare to another object.
    */
   public boolean equals(Object other) {
-    return ( ( (other instanceof JSONConstant) 
-               && (this.value == ((JSONConstant) other).value) )
-             || (this.value == other) );
+    return (((other instanceof JSONConstant) 
+              && (this.value == ((JSONConstant) other).value))
+              || (this.value == other));
   } // equals(Object)
 
   /**
    * Compute the hash code.
    */
   public int hashCode() {
-    if (this.value == null)
+    if (this.value == null) {
       return 0;
-    else
+    } else {
       return this.value.hashCode();
+    } // if/else
   } // hashCode()
 
   // +--------------------+------------------------------------------
@@ -96,5 +101,4 @@ public class JSONConstant implements JSONValue {
   public Object getValue() {
     return this.value;
   } // getValue()
-
 } // class JSONConstant

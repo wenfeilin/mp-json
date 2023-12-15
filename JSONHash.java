@@ -7,6 +7,10 @@ import java.util.Random;
 
 /**
  * JSON hashes/objects.
+ * 
+ * @author SamR (starter code)
+ * @author Lydia Ye
+ * @author Wenfei Lin
  */
 public class JSONHash implements JSONValue {
 
@@ -71,11 +75,12 @@ public class JSONHash implements JSONValue {
     while (it.hasNext()) {
       KVPair<JSONString, JSONValue> next = it.next();
       str += next.key() + ": " + next.value() + ", ";
-    }
+    } // while
 
     if (str.length() > 1) {
       str = str.substring(0, str.length() - 2);
-    }
+    } // if
+
     return str + "}";
   } // toString()
 
@@ -87,7 +92,7 @@ public class JSONHash implements JSONValue {
       return Arrays.equals(this.buckets, ((JSONHash) other).buckets);
     } else {
       return false;
-    }
+    } // if/else
   } // equals(Object)
 
   /**
@@ -159,36 +164,48 @@ public class JSONHash implements JSONValue {
   @SuppressWarnings("unchecked")
   public Iterator<KVPair<JSONString, JSONValue>> iterator() {
     return new Iterator<KVPair<JSONString, JSONValue>>() {
-      int outerIndex = 0; // The position in the array of buckets
-      int innerIndex = 0; // The position in the arraylist of current bucket
+      // The position in the array of buckets
+      int outerIndex = 0; 
+      // The position in the arraylist of current bucket
+      int innerIndex = 0; 
 
+      /**
+       * Determine if the hash (hash table) has a next element (KVPair).
+       */
       public boolean hasNext() {
         if (outerIndex >= buckets.length) {
-          // if the position is out of bound of the array of buckets
+          // If the position is out of bound of the array of buckets
           return false;
         } // if
 
-        // if the current bucket is null
+        // If the current bucket is null
         if (buckets[outerIndex] == null) {
           for (int i = outerIndex + 1; i < buckets.length; i++) {
             if (buckets[i] != null) {
-              return true; // if we found next nonempty bucket
+              // If we found next nonempty bucket
+              return true; 
             } // if
           } // for
-          return false; // if all subsequent buckets are null too
+          // If all subsequent buckets are null too
+          return false; 
         } // if
 
         return true;
       } // hasNext()
 
+      /**
+       * Return the next element (KVPair) in the hash (hash table) and 
+       * prepare the iterator for the next next call by making it point to 
+       * the next, next element.
+       */
       public KVPair<JSONString, JSONValue> next() throws NoSuchElementException {
         if (!this.hasNext()) {
           throw new NoSuchElementException();
         } // if
 
-        // if the current bucket is null (will only happen when calling next() for the first time)
+        // If the current bucket is null (can only happen when calling next() for the first time)
         if (buckets[outerIndex] == null) {
-          // find the index of next nonempty bucket
+          // Find the index of next nonempty bucket
           do {
             outerIndex++;
           } while (buckets[outerIndex] == null);
@@ -197,25 +214,23 @@ public class JSONHash implements JSONValue {
 
         ArrayList<KVPair<JSONString, JSONValue>> alist =
             (ArrayList<KVPair<JSONString, JSONValue>>) buckets[outerIndex];
-
         KVPair<JSONString, JSONValue> next = alist.get(innerIndex);
 
         if (innerIndex < alist.size() - 1) {
           // if the current KVPair is not the last one in the bucket
           innerIndex++;
         } else {
-          // if the current KVPair is the last one in the current bucket, we advance
+          // If the current KVPair is the last one in the current bucket, we advance
           // the outerIndex to the next nonempty bucket
           do {
             outerIndex++;
           } while (outerIndex < buckets.length && buckets[outerIndex] == null);
           innerIndex = 0;
-        } // if...else
+        } // if/else
         return next;
       } // next()
     }; // new Iterator for buckets
   } // iterator()
-
 
   /**
    * Set a value associated with a key.
@@ -231,6 +246,7 @@ public class JSONHash implements JSONValue {
     int index = find(key);
     ArrayList<KVPair<JSONString, JSONValue>> alist =
         (ArrayList<KVPair<JSONString, JSONValue>>) this.buckets[index];
+
     // Special case: Nothing there yet
     if (alist == null) {
       alist = new ArrayList<KVPair<JSONString, JSONValue>>();
@@ -245,7 +261,7 @@ public class JSONHash implements JSONValue {
     alist.add(new KVPair<JSONString, JSONValue>(key, value));
     ++this.size;
 
-    return; // And we're done
+    return; 
   } // set(JSONString, JSONValue)
 
   /**
@@ -264,11 +280,13 @@ public class JSONHash implements JSONValue {
 
     // Move each pair in each bucket from the old table to their appropriate
     // location in the new table.
-    for (int i = 0; i < oldBuckets.length; i++) { // cycle through each bucket
+    // Cycle through each bucket
+    for (int i = 0; i < oldBuckets.length; i++) { 
       ArrayList<KVPair<JSONString, JSONValue>> oldBucket =
           (ArrayList<KVPair<JSONString, JSONValue>>) oldBuckets[i];
       if (oldBucket != null) {
-        for (int j = 0; j < oldBucket.size(); j++) { // cycle through each KVPair in a bucket
+        // Cycle through each KVPair in a bucket
+        for (int j = 0; j < oldBucket.size(); j++) { 
           set(oldBucket.get(j).key(), oldBucket.get(j).value());
         } // for
       } // if
